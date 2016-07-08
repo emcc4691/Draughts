@@ -1,0 +1,49 @@
+﻿body {
+	table {
+		border-spacing: 0;
+		border: solid 1px black;
+		margin: 100px auto;
+
+		tr {
+			td {
+				height: 100px;
+				width: 100px;
+				border: solid 1px black;
+				text-align: center;
+
+				.counter {
+					height: 70px;
+					width: 70px;
+				}
+			}
+
+			td.black {
+				background-color: darkslategrey;
+			}
+
+			td.white {
+				background-color: azure;
+			}
+
+			td.selected {
+				border: 3px solid red;
+				height: 96px;
+				width: 96px;
+			}
+
+			td.selectable {
+				cursor: pointer;
+			}
+
+			td.possibleMove {
+				border: 3px solid blue;
+				height: 96px;
+				width: 96px;
+			}
+		}
+	}
+
+	.hidden {
+		display: none;
+	}
+}
