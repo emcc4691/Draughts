@@ -100,6 +100,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="scripts\Game.js" />
+    <Content Include="scripts\GameState.js" />
     <Content Include="scripts\Main.js" />
     <Content Include="styles\styles.css">
       <DependentUpon>styles.less</DependentUpon>

@@ -12,6 +12,8 @@ body table tr td {
 body table tr td .counter {
   height: 70px;
   width: 70px;
+  position: absolute;
+  margin: -35px;
 }
 body table tr td.black {
   background-color: darkslategrey;

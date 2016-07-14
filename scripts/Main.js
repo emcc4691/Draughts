@@ -80,16 +80,12 @@ function MarkSquareSelectable() {
 }
 
 function IsSquareSelectable(element) {
-    var counter = $(element).find('.counter');
-
-    if (counter.length < 1)
-        return false;
-
-    return counter.attr('isPlayer') == game.isPlayerTurn.toString();
+    return IsSquareContainingActivePlayerCounter($(element).attr('id'));
 }
 
 function SelectCounter(squareID) {
     $('.selected').removeClass('selected');
+    $('.possibleMove').removeClass('possibleMove');
 
     $('#' + squareID).addClass('selected');
 
@@ -98,32 +94,98 @@ function SelectCounter(squareID) {
     });
 }
 
+function FindCounter(squareID) {
+    var counters = $('#' + squareID).find('.counter');
+
+    if (counters.length >= 1)
+        return $(counters[0]);
+    return null;
+}
+
+function IsSquareEmpty(squareID) {
+    return FindCounter(squareID) == null;
+}
+
+function IsSquareContainingActivePlayerCounter(squareID) {
+    var counter = FindCounter(squareID);
+
+    if (!counter) return false;
+
+    return counter.attr('isPlayer') == game.isPlayerTurn.toString();
+}
+
+function IsSquareContainingActiveOpponentCounter(squareID) {
+    var counter = FindCounter(squareID);
+
+    if (!counter) return false;
+
+    return counter.attr('isPlayer') == (!game.isPlayerTurn).toString();
+}
+
 function GetPossibleSquaresToMoveTo(squareID) {
     var possibleMoves = [];
 
-    var result = possibleMoves.concat(GetImmediateSurroundingSquares(squareID));
+    possibleMoves = possibleMoves.concat(GetImmediateEmptySurroundingSquares(squareID));
+    possibleMoves = possibleMoves.concat(GetImmediatesSquaresToJumpTo(squareID));
 
-    return result;
+    return possibleMoves;
 }
 
-function GetImmediateSurroundingSquares(squareID) {
+function GetImmediateEmptySurroundingSquares(squareID) {
     var squareIDs = [];
 
     var topLeft = GetSquareID(squareID, -1, 1)
-    if (topLeft)
+    if (topLeft && IsSquareEmpty(topLeft))
         squareIDs.push(topLeft);
 
     var topRight = GetSquareID(squareID, 1, 1)
-    if (topRight)
+    if (topRight && IsSquareEmpty(topRight))
         squareIDs.push(topRight);
 
     var bottomLeft = GetSquareID(squareID, -1, -1)
-    if (bottomLeft)
+    if (bottomLeft && IsSquareEmpty(bottomLeft))
         squareIDs.push(bottomLeft);
 
     var bottomRight = GetSquareID(squareID, 1, -1)
-    if (bottomRight)
+    if (bottomRight && IsSquareEmpty(bottomRight))
         squareIDs.push(bottomRight);
+
+    return squareIDs;
+}
+
+function GetImmediatesSquaresToJumpTo(squareID) {
+    var squareIDs = [];
+
+    var topLeft = GetSquareID(squareID, -1, 1);
+    if (topLeft && IsSquareContainingActiveOpponentCounter(topLeft)) {
+        var topTopLeftLeft = GetSquareID(topLeft, -1, 1);
+
+        if (topTopLeftLeft && IsSquareEmpty(topTopLeftLeft))
+            squareIDs.push(topTopLeftLeft);
+    }
+
+    var topRight = GetSquareID(squareID, 1, 1);
+    if (topRight && IsSquareContainingActiveOpponentCounter(topRight)) {
+        var topTopRightRight = GetSquareID(topRight, 1, 1);
+
+        if (topTopRightRight && IsSquareEmpty(topTopRightRight))
+            squareIDs.push(topTopRightRight);
+    }
+
+    var bottomLeft = GetSquareID(squareID, -1, -1);
+    if (bottomLeft && IsSquareContainingActiveOpponentCounter(bottomLeft)) {
+        var bottonBottomLeftLeft = GetSquareID(bottomLeft, -1, -1);
+
+        if (bottonBottomLeftLeft && IsSquareEmpty(bottonBottomLeftLeft))
+            squareIDs.push(bottonBottomLeftLeft);
+    }
+
+    var bottomRight = GetSquareID(squareID, 1, -1);
+    if (bottomRight && IsSquareContainingActiveOpponentCounter(bottomRight))
+        var bottonBottomRightRight = GetSquareID(bottomRight, 1, -1);
+
+    if (bottonBottomRightRight && IsSquareEmpty(bottonBottomRightRight))
+        squareIDs.push(bottonBottomRightRight);
 
     return squareIDs;
 }
@@ -139,6 +201,26 @@ function GetSquareID(squareID, right, up) {
     var newColumn = column + right;
 
     return newColumn.toString() + newRow.toString();
+}
+
+function MoveCounter(fromID, toID) {
+    if (!IsSquareSelectable(fromID) || !GetPossibleSquaresToMoveTo(fromID).contains(toID))
+        return;
+
+    var fromLeft = $('#' + fromID).position().left;
+    var toLeft = $('#' + toID).position().left;
+    var fromTop = $('#' + fromID).position().top;
+    var toTop = $('#' + toID).position().top;
+
+    var counter = $('#' + fromID).find('.counter');
+
+    Move(counter, toTop - fromTop, toLeft - fromLeft);
+}
+
+function Move(element, top, left) {
+    var leftValue = '+=' + left + 'px';
+    var topValue = '+=' + top + 'px';
+    $(element).animate({ left: leftValue, top: topValue }, 'slow');
 }
 
 document.addEventListener('DOMContentLoaded', Initialise);
