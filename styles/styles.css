@@ -16,7 +16,7 @@ body table tr td .counter {
   margin: -35px;
 }
 body table tr td.black {
-  background-color: darkslategrey;
+  background-color: #566;
 }
 body table tr td.white {
   background-color: azure;
