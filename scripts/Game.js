@@ -1,4 +1,4 @@
 ﻿function Game() {
     this.isPlaying = true;
-    this.isPlayerTurn = true;
+    this.isPlayerTurn = false;
 }

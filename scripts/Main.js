@@ -135,12 +135,10 @@ function MoveTo(event) {
     var fromID = $($('.selected')[0]).attr('id');
     var toID = $(GetSquare(event)).attr('id');
     MoveCounter(fromID, toID);
-
-    Reset();
 }
 
 function Reset() {
-    // TODO - update game state
+    game.isPlayerTurn = !game.isPlayerTurn;
 
     $('.selected').removeClass('selected');
     $('.possibleMove').removeClass('possibleMove');
@@ -168,6 +166,7 @@ function Move(element, fromID, toID) {
 function ReplaceCounterCell(fromID, toID) {
     $('td#' + fromID).find('.counter').remove();
     DrawCounter({ row: parseInt(toID.substring(1, 2)), column: parseInt(toID.substring(0, 1)), isPlayer: game.isPlayerTurn });
+    Reset();
 }
 
 document.addEventListener('DOMContentLoaded', Initialise);
