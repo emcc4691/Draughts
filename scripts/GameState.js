@@ -35,6 +35,26 @@ function IsSquareEmpty(squareID) {
     return FindCounter(squareID) == null;
 }
 
+GameState.prototype.getJumpedCounterID = function (fromID, toID) {
+    var fromRow = parseInt(fromID.substring(1, 2));
+    var fromColumn = parseInt(fromID.substring(0, 1));
+    var toRow = parseInt(toID.substring(1, 2));
+    var toColumn = parseInt(toID.substring(0, 1));
+
+    if (Math.abs(fromRow - toRow) != 2 || Math.abs(fromColumn - toColumn) != 2)
+        return;
+
+    var middleRow = (fromRow + toRow) / 2;
+    var middleColumn = (fromColumn + toColumn) / 2;
+
+    var middleSquareID = middleColumn.toString() + middleRow.toString();
+    var counter = this.findCounter(middleSquareID);
+
+    if (!counter || counter.IsPlayer == game.isPlayerTurn)
+        return;
+
+    return middleSquareID;
+}
 
 GameState.prototype.isSquareSelectable = function (squareID) {
     return this.isSquareContainingActivePlayerCounter(squareID);

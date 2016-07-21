@@ -121,11 +121,6 @@ function GetSquareID(squareID, right, up) {
 }
 
 function MoveCounter(fromID, toID) {
-    var state = new GameState();
-
-    if (!state.isValidMove(fromID, toID))
-        return;
-
     var counter = $('#' + fromID).find('.counter');
 
     Move(counter, fromID, toID);
@@ -134,6 +129,16 @@ function MoveCounter(fromID, toID) {
 function MoveTo(event) {
     var fromID = $($('.selected')[0]).attr('id');
     var toID = $(GetSquare(event)).attr('id');
+
+    var state = new GameState();
+    var jumpedCounterID = state.getJumpedCounterID(fromID, toID);
+    if (jumpedCounterID) {
+        $('#' + jumpedCounterID).find('.counter').remove();
+    }
+
+    if (!state.isValidMove(fromID, toID))
+        return;
+
     MoveCounter(fromID, toID);
 }
 
