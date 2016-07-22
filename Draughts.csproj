@@ -99,6 +99,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="scripts\Counter.js" />
     <Content Include="scripts\Game.js" />
     <Content Include="scripts\GameState.js" />
     <Content Include="scripts\Main.js" />

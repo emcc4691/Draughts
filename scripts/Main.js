@@ -26,8 +26,8 @@ function GetSquareColor(row, column) {
     return ((isRowEven && isColumnEven) || (!isRowEven && !isColumnEven)) ? 'black' : 'white';
 }
 
-function GetCounterImage(color) {
-    return "images/counter-" + color + ".png";
+function GetCounterImage(color, isKing) {
+    return "images/counter-" + color + (isKing ? '-king' : '') + ".png";
 }
 
 function DrawCounters(coordinates) {
@@ -36,9 +36,9 @@ function DrawCounters(coordinates) {
     });
 }
 
-function DrawCounter(coord) {
-    var squareID = coord.column.toString() + coord.row.toString();
-    $('td#' + squareID).append('<img class="counter" isPlayer=' + coord.isPlayer + ' src="' + GetCounterImage(coord.isPlayer ? 'black' : 'white') + '" />');
+function DrawCounter(counter) {
+    var squareID = counter.column.toString() + counter.row.toString();
+    $('td#' + squareID).append('<img class="counter" isPlayer=' + counter.isPlayer + ' src="' + GetCounterImage(counter.isPlayer ? 'black' : 'white', counter.isKing) + '" />');
 }
 
 function GetInitialCounters() {
@@ -48,7 +48,7 @@ function GetInitialCounters() {
         var j = i % 2 == 0 ? 0 : 1;
 
         for (j; j < 8; j = j + 2) {
-            counters.push({ row: i, column: j, isPlayer: true });
+            counters.push({ row: i, column: j, isPlayer: true, isKing: false });
         }
     }
 
@@ -56,7 +56,7 @@ function GetInitialCounters() {
         var j = i % 2 == 0 ? 0 : 1;
 
         for (j; j < 8; j = j + 2) {
-            counters.push({ row: i, column: j, isPlayer: false });
+            counters.push({ row: i, column: j, isPlayer: false, isKing: false });
         }
     }
 
@@ -120,12 +120,6 @@ function GetSquareID(squareID, right, up) {
     return newColumn.toString() + newRow.toString();
 }
 
-function MoveCounter(fromID, toID) {
-    var counter = $('#' + fromID).find('.counter');
-
-    Move(counter, fromID, toID);
-}
-
 function MoveTo(event) {
     var fromID = $($('.selected')[0]).attr('id');
     var toID = $(GetSquare(event)).attr('id');
@@ -142,15 +136,10 @@ function MoveTo(event) {
     MoveCounter(fromID, toID);
 }
 
-function Reset() {
-    game.isPlayerTurn = !game.isPlayerTurn;
+function MoveCounter(fromID, toID) {
+    var counter = $('#' + fromID).find('.counter');
 
-    $('.selected').removeClass('selected');
-    $('.possibleMove').removeClass('possibleMove');
-    $('td').off('click', MoveTo);
-    $('td').off('click', ClickSquare);
-    MarkSquareSelectable();
-    AddSquareClickEvents();
+    Move(counter, fromID, toID);
 }
 
 function Move(element, fromID, toID) {
@@ -172,6 +161,17 @@ function ReplaceCounterCell(fromID, toID) {
     $('td#' + fromID).find('.counter').remove();
     DrawCounter({ row: parseInt(toID.substring(1, 2)), column: parseInt(toID.substring(0, 1)), isPlayer: game.isPlayerTurn });
     Reset();
+}
+
+function Reset() {
+    game.isPlayerTurn = !game.isPlayerTurn;
+
+    $('.selected').removeClass('selected');
+    $('.possibleMove').removeClass('possibleMove');
+    $('td').off('click', MoveTo);
+    $('td').off('click', ClickSquare);
+    MarkSquareSelectable();
+    AddSquareClickEvents();
 }
 
 document.addEventListener('DOMContentLoaded', Initialise);
