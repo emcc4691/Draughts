@@ -1,5 +1,5 @@
 ﻿function GameState() {
-    var counterPositions = [];
+    this.counterPositions = [];
 
     this.initialise();
 }
@@ -16,8 +16,12 @@ function GetCounters() {
     for (var i = 0; i < cells.length; i++) {
         var cellID = $(cells[i]).attr('id');
 
-        if (!IsSquareEmpty(cellID))
-            cellPositions.push({ ID: cellID, IsPlayer: $(cells[i]).find('.counter').attr('IsPlayer') });
+        if (!IsSquareEmpty(cellID)) {
+            var isPlayer = $(cells[i]).find('.counter').attr('IsPlayer');
+            var isKing = $(cells[i]).find('.counter').attr('IsKing');
+            cellPositions.push(new Counter(cellID, isPlayer, isKing));
+        }
+
     }
 
     return cellPositions;
@@ -72,6 +76,11 @@ GameState.prototype.findCounter = function (squareID) {
     return counters[0];
 }
 
+GameState.prototype.isCounterKing = function (squareID) {
+    var counter = this.findCounter(squareID);
+    return counter.IsKing;
+}
+
 GameState.prototype.isSquareContainingActivePlayerCounter = function (squareID) {
     var counter = this.findCounter(squareID);
 
@@ -90,8 +99,9 @@ GameState.prototype.isSquareContainingActiveOpponentCounter = function (squareID
 
 
 
-GameState.prototype.getImmediateEmptySurroundingSquares = function (squareID, isCounterKing) {
+GameState.prototype.getImmediateEmptySurroundingSquares = function (squareID) {
     var squareIDs = [];
+    var isCounterKing = this.isCounterKing(squareID);
 
     if (game.isPlayerTurn || isCounterKing) {
         var topLeft = GetSquareID(squareID, -1, 1)
@@ -117,8 +127,9 @@ GameState.prototype.getImmediateEmptySurroundingSquares = function (squareID, is
     return squareIDs;
 }
 
-GameState.prototype.getImmediatesSquaresToJumpTo = function (squareID, isCounterKing) {
+GameState.prototype.getImmediatesSquaresToJumpTo = function (squareID) {
     var squareIDs = [];
+    var isCounterKing = this.isCounterKing(squareID);
 
     if (game.isPlayerTurn || isCounterKing) {
         var topLeft = GetSquareID(squareID, -1, 1);
@@ -160,10 +171,9 @@ GameState.prototype.getImmediatesSquaresToJumpTo = function (squareID, isCounter
 
 GameState.prototype.getPossibleSquaresToMoveTo = function (squareID) {
     var possibleMoves = [];
-    var isCounterKing = $(this.findCounter(squareID)).attr('IsKing') == "true";
 
-    possibleMoves = possibleMoves.concat(this.getImmediateEmptySurroundingSquares(squareID, isCounterKing));
-    possibleMoves = possibleMoves.concat(this.getImmediatesSquaresToJumpTo(squareID, isCounterKing));
+    possibleMoves = possibleMoves.concat(this.getImmediateEmptySurroundingSquares(squareID));
+    possibleMoves = possibleMoves.concat(this.getImmediatesSquaresToJumpTo(squareID));
 
     return possibleMoves;
 }

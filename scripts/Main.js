@@ -26,19 +26,10 @@ function GetSquareColor(row, column) {
     return ((isRowEven && isColumnEven) || (!isRowEven && !isColumnEven)) ? 'black' : 'white';
 }
 
-function GetCounterImage(color, isKing) {
-    return "images/counter-" + color + (isKing ? '-king' : '') + ".png";
-}
-
-function DrawCounters(coordinates) {
-    coordinates.forEach(function (coord) {
-        DrawCounter(coord);
+function DrawCounters(counters) {
+    counters.forEach(function (counter) {
+        counter.draw();
     });
-}
-
-function DrawCounter(counter) {
-    var squareID = counter.column.toString() + counter.row.toString();
-    $('td#' + squareID).append('<img class="counter" isPlayer=' + counter.isPlayer + ' src="' + GetCounterImage(counter.isPlayer ? 'black' : 'white', counter.isKing) + '" />');
 }
 
 function GetInitialCounters() {
@@ -48,7 +39,8 @@ function GetInitialCounters() {
         var j = i % 2 == 0 ? 0 : 1;
 
         for (j; j < 8; j = j + 2) {
-            counters.push({ row: i, column: j, isPlayer: true, isKing: false });
+            var squareID = j.toString() + i.toString();
+            counters.push(new Counter(squareID, isPlayer = true, isKing = false));
         }
     }
 
@@ -56,7 +48,8 @@ function GetInitialCounters() {
         var j = i % 2 == 0 ? 0 : 1;
 
         for (j; j < 8; j = j + 2) {
-            counters.push({ row: i, column: j, isPlayer: false, isKing: false });
+            var squareID = j.toString() + i.toString();
+            counters.push(new Counter(squareID, isPlayer = false, isKing = false));
         }
     }
 
@@ -123,26 +116,26 @@ function GetSquareID(squareID, right, up) {
 function MoveTo(event) {
     var fromID = $($('.selected')[0]).attr('id');
     var toID = $(GetSquare(event)).attr('id');
-
     var state = new GameState();
     var jumpedCounterID = state.getJumpedCounterID(fromID, toID);
-    if (jumpedCounterID) {
+    var hasJumpedCounter = jumpedCounterID != null;
+    if (hasJumpedCounter) {
         $('#' + jumpedCounterID).find('.counter').remove();
     }
 
     if (!state.isValidMove(fromID, toID))
         return;
 
-    MoveCounter(fromID, toID);
+    MoveCounter(fromID, toID, hasJumpedCounter);
 }
 
-function MoveCounter(fromID, toID) {
+function MoveCounter(fromID, toID, hasJumpedCounter) {
     var counter = $('#' + fromID).find('.counter');
 
-    Move(counter, fromID, toID);
+    Move(counter, fromID, toID, hasJumpedCounter);
 }
 
-function Move(element, fromID, toID) {
+function Move(element, fromID, toID, hasJumpedCounter) {
     var fromLeft = $('#' + fromID).position().left;
     var toLeft = $('#' + toID).position().left;
     var fromTop = $('#' + fromID).position().top;
@@ -154,17 +147,21 @@ function Move(element, fromID, toID) {
     var leftValue = '+=' + left + 'px';
     var topValue = '+=' + top + 'px';
 
-    $(element).animate({ left: leftValue, top: topValue }, { duration: 'slow', complete: function () { ReplaceCounterCell(fromID, toID); } });
+    $(element).animate({ left: leftValue, top: topValue }, { duration: 'slow', complete: function () { ReplaceCounterCell(fromID, toID, hasJumpedCounter) } });
 }
 
-function ReplaceCounterCell(fromID, toID) {
+function ReplaceCounterCell(fromID, toID, hasJumpedCounter) {
+    var isKing = $('td#' + fromID).find('.counter').attr('IsKing');
     $('td#' + fromID).find('.counter').remove();
-    DrawCounter({ row: parseInt(toID.substring(1, 2)), column: parseInt(toID.substring(0, 1)), isPlayer: game.isPlayerTurn });
-    Reset();
+    DrawCounter(new Counter(toID, isPlayer = game.isPlayerTurn, isKing));
+    Reset(toID, hasJumpedCounter);
 }
 
-function Reset() {
-    game.isPlayerTurn = !game.isPlayerTurn;
+function Reset(squareMovedTo, hasJumpedCounter) {
+    //(new GameState()).getImmediatesSquaresToJumpTo(squareMovedTo).Any
+
+    var isStillPlayerTurn = false; // TODO
+    game.isPlayerTurn = isStillPlayerTurn ? game.isPlayerTurn : !game.isPlayerTurn;
 
     $('.selected').removeClass('selected');
     $('.possibleMove').removeClass('possibleMove');
