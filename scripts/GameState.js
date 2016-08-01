@@ -54,7 +54,7 @@ GameState.prototype.getJumpedCounterID = function (fromID, toID) {
     var middleSquareID = middleColumn.toString() + middleRow.toString();
     var counter = this.findCounter(middleSquareID);
 
-    if (!counter || counter.IsPlayer == game.isPlayerTurn)
+    if (!counter || counter.isPlayer == game.isPlayerTurn.toString())
         return;
 
     return middleSquareID;
@@ -69,7 +69,7 @@ GameState.prototype.isSquareEmpty = function (squareID) {
 }
 
 GameState.prototype.findCounter = function (squareID) {
-    var counters = this.counterPositions.filter(function (pos) { return pos.ID == squareID; });
+    var counters = this.counterPositions.filter(function (pos) { return pos.squareID == squareID; });
 
     if (counters.length < 1)
         return null;
@@ -78,7 +78,7 @@ GameState.prototype.findCounter = function (squareID) {
 
 GameState.prototype.isCounterKing = function (squareID) {
     var counter = this.findCounter(squareID);
-    return counter.IsKing;
+    return counter.isKing;
 }
 
 GameState.prototype.isSquareContainingActivePlayerCounter = function (squareID) {
@@ -86,7 +86,7 @@ GameState.prototype.isSquareContainingActivePlayerCounter = function (squareID) 
 
     if (!counter) return false;
 
-    return counter.IsPlayer == game.isPlayerTurn.toString();
+    return counter.isPlayer == game.isPlayerTurn.toString();
 }
 
 GameState.prototype.isSquareContainingActiveOpponentCounter = function (squareID) {
@@ -94,10 +94,8 @@ GameState.prototype.isSquareContainingActiveOpponentCounter = function (squareID
 
     if (!counter) return false;
 
-    return counter.IsPlayer != game.isPlayerTurn.toString();
+    return counter.isPlayer != game.isPlayerTurn.toString();
 }
-
-
 
 GameState.prototype.getImmediateEmptySurroundingSquares = function (squareID) {
     var squareIDs = [];
@@ -172,8 +170,12 @@ GameState.prototype.getImmediatesSquaresToJumpTo = function (squareID) {
 GameState.prototype.getPossibleSquaresToMoveTo = function (squareID) {
     var possibleMoves = [];
 
-    possibleMoves = possibleMoves.concat(this.getImmediateEmptySurroundingSquares(squareID));
     possibleMoves = possibleMoves.concat(this.getImmediatesSquaresToJumpTo(squareID));
+
+    if (possibleMoves.length > 0)
+        return possibleMoves;
+
+    possibleMoves = possibleMoves.concat(this.getImmediateEmptySurroundingSquares(squareID));
 
     return possibleMoves;
 }
@@ -190,6 +192,19 @@ GameState.prototype.isValidMove = function (from, to) {
     return false;
 }
 
+GameState.prototype.areAnyCountersAvailableToTake = function (squareID) {
+    return this.getImmediatesSquaresToJumpTo(squareID).length > 0;
+}
 
+GameState.prototype.getPossibleSquaresThatCanTakeCounters = function () {
+    var counters = this.counterPositions;
+    var squares = [];
+
+    for (var i = 0; i < counters.length; i++) {
+        var element = counters[i];
+        if (this.areAnyCountersAvailableToTake(element.cellID))
+            squares.push(element);
+    };
+}
 
 
