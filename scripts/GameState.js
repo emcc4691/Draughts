@@ -61,7 +61,15 @@ GameState.prototype.getJumpedCounterID = function (fromID, toID) {
 }
 
 GameState.prototype.isSquareSelectable = function (squareID) {
-    return this.isSquareContainingActivePlayerCounter(squareID);
+    var isActiveCounter = this.isSquareContainingActivePlayerCounter(squareID);
+
+    if (!isActiveCounter)
+        return false;
+
+    var canMove = this.getPossibleSquaresToMoveTo(squareID).length > 0;
+
+    return canMove;
+
 }
 
 GameState.prototype.isSquareEmpty = function (squareID) {
