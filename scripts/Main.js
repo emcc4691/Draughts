@@ -78,10 +78,11 @@ function MarkSquareSelectable() {
 
     var state = new GameState();
 
-    var counterTakers = state.getPossibleSquaresThatCanTakeCounters()
+    var counterTakers = state.getPossibleSquaresThatCanTakeCounters();
+
     if (counterTakers.length > 0) {
         counterTakers.forEach(function (element) {
-            $('#' + element.cellID).addClass('selectable');
+            $('#' + element.squareID).addClass('selectable');
         });
 
         return;
@@ -161,11 +162,17 @@ function Move(element, fromID, toID, hasJumpedCounter) {
 
 function ReplaceCounterCell(fromID, toID, hasJumpedCounter) {
     var isKing = $('td#' + fromID).find('.counter').attr('IsKing');
-    var counter = new Counter(toID, isPlayer = game.isPlayerTurn, isKing);
     $('td#' + fromID).find('.counter').remove();
+
+    var counter = new Counter(toID, isPlayer = game.isPlayerTurn, isKing);
+    counter.isKing = counter.shouldBeKing();
 
     counter.draw();
     Reset(toID, hasJumpedCounter);
+}
+
+function IsCounterToBecomeKing(toID) {
+
 }
 
 function Reset(squareMovedTo, hasJumpedCounter) {
@@ -187,10 +194,9 @@ function Reset(squareMovedTo, hasJumpedCounter) {
         MarkSquareSelectable(); // Only square possible to select is the one already moved.
         AddSquareClickEvents();
     }
-    else
+    else {
         SelectCounter(squareMovedTo);
-
-
+    }
 }
 
 document.addEventListener('DOMContentLoaded', Initialise);

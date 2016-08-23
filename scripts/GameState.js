@@ -21,7 +21,6 @@ function GetCounters() {
             var isKing = $(cells[i]).find('.counter').attr('IsKing');
             cellPositions.push(new Counter(cellID, isPlayer, isKing));
         }
-
     }
 
     return cellPositions;
@@ -210,9 +209,11 @@ GameState.prototype.getPossibleSquaresThatCanTakeCounters = function () {
 
     for (var i = 0; i < counters.length; i++) {
         var element = counters[i];
-        if (this.areAnyCountersAvailableToTake(element.cellID))
+        if (this.areAnyCountersAvailableToTake(element.squareID))
             squares.push(element);
     };
+
+    return squares;
 }
 
 

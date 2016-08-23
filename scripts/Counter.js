@@ -17,3 +17,12 @@ Counter.prototype.draw = function () {
 Counter.prototype.getImage = function () {
     return "images/counter-" + (this.isPlayer ? 'white' : 'black') + (this.isKing ? '-king' : '') + ".png";
 }
+
+Counter.prototype.shouldBeKing = function () {
+    if (this.isKing)
+        return true;
+
+    var row = parseInt(this.squareID.substring(1, 2));
+
+    return (this.isPlayer && row == 0) || (!this.isPlayer && row == 7);
+}

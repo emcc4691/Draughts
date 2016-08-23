@@ -33,6 +33,7 @@ body table tr td.possibleMove {
   border: 3px solid blue;
   height: 96px;
   width: 96px;
+  cursor: pointer;
 }
 body .hidden {
   display: none;
