@@ -11,7 +11,7 @@ Counter.prototype.MakeCounterKing = function () {
 }
 
 Counter.prototype.draw = function () {
-    $('td#' + this.squareID).append('<img class="counter" isPlayer=' + this.isPlayer + ' src="' + this.getImage() + '" />');
+    $('td#' + this.squareID).append('<img class="counter" isPlayer="' + this.isPlayer + '" isKing="' + this.isKing + '" src="' + this.getImage() + '" />');
 }
 
 Counter.prototype.getImage = function () {
